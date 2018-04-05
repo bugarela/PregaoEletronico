@@ -1,0 +1,103 @@
+Thread 1 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 2 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 3 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 4 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 5 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 6 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 7 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 8 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 9 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 10 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 11 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 12 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 13 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 14 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 15 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 16 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 17 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 18 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 19 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 20 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Saldo de itens:
+Item               Quantidade  Ofertado
+  foo                   99700    100000

@@ -1,0 +1,33 @@
+Thread 1 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 2 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 3 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 4 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 5 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Thread 6 - Portfolio de itens:
+Item               Quantidade  Demanda
+  foo                      15       15
+  bar                       0       51
+
+Saldo de itens:
+Item               Quantidade  Ofertado
+  foo                      10       100
