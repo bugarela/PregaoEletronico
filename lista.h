@@ -7,8 +7,8 @@ typedef struct a{
 typedef struct b{
     Oferta *inicio, *fim;
     int tamanho;
-}Fila;
+}Lista;
 
-void inicia(Fila *fila);
-void inserir(char nome[255], int qtd, Fila *fila);
-Oferta pop(Fila *fila);
+void inicia(Lista *lista);
+void inserir(char nome[255], int qtd, Lista *lista);
+Oferta pop(Lista *lista);

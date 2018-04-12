@@ -3,15 +3,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include "utils.h"
-#include "fila.h"
-
-Fila fila;
+#include "corretor.h"
 
 int main(int argc, char *argv[]){
    FILE *fp;
    char buff[255];
    int qtd;
-   char nomearq[255];
+   int ret,i;
 
    if (argv[1] == NULL || argv[2] == NULL){
        printf("Uso: %s nthr nomearq\n",argv[0]);
@@ -22,20 +20,39 @@ int main(int argc, char *argv[]){
    strcpy(nomearq,argv[2]);
    printf("nthr= %i, nomearq= %s\n\n",nthr, nomearq);
 
-   inicia(&fila);
+   pthread_t threads[nthr];
+   int rc;
+   long t;
+
+   /* Criar Threads */
+   for(t=0;t<nthr;t++){
+       rc = pthread_create(&threads[t], NULL, (void *)corretor, (void *)(t+1));
+       if(rc) printf("Erro ao criar a thread %ld\n",t);
+   }
+
+   for(t=0;t<nthr;t++){
+       rc = pthread_join(threads[t],NULL);
+       if(!rc) printf("Erro no join da thread %ld\n", t);
+   }
+
+   inicia(&ofertas);
 
    fp = fopen(nomearq, "r");
-   while (fscanf(fp, "%s", buff) != EOF){
-       fscanf(fp, "%i", &qtd);
-       //printf("%ix %s\n", qtd, buff );
-       inserir(buff, qtd, &fila);
-       printf("Inserido %ix %s na fila\n", fila.inicio->qtd, fila.inicio->nome);
+
+   ret = fscanf(fp, "%s %i", buff, &qtd);
+   while (ret != EOF){
+       if(ret ==2){
+           inserir(buff, qtd, &ofertas);
+           printf("Inserido %ix %s nas ofertas\n", qtd, buff);
+       }
+
+       ret = fscanf(fp, "%s %i", buff, &qtd);
    }
 
    fclose(fp);
 
-   while (fila.inicio != NULL){
-       Oferta atual = pop(&fila);
+   while (ofertas.inicio != NULL){
+       Oferta atual = pop(&ofertas);
        printf("%ix %s\n", atual.qtd, atual.nome );
    }
 
