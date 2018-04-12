@@ -12,3 +12,5 @@ typedef struct b{
 void inicia(Lista *lista);
 void inserir(char nome[255], int qtd, Lista *lista);
 Oferta pop(Lista *lista);
+int compra(char nome[255], int qtd, Lista *lista);
+Oferta novaOferta(Lista *lista);
