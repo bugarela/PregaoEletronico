@@ -6,6 +6,7 @@
 #include "corretor.h"
 
 int main(int argc, char *argv[]){
+    ofertasDiponiveis = 0;
     FILE *fp;
     char buff[255];
     int qtd;
@@ -44,14 +45,22 @@ int main(int argc, char *argv[]){
 
     ret = fscanf(fp, "%s %i", buff, &qtd);
     while (ret != EOF){
-        if(ret ==2){
+        if(ret == 2){
+            pthread_mutex_lock(&mutex);
+
             inserir(buff, qtd, &ofertas);
             printf("Inserido %ix %s nas ofertas\n", qtd, buff);
+
+            ofertasDiponiveis++;
+            pthread_cond_signal(&c);
+            pthread_mutex_unlock(&mutex);
+
         }
         ret = fscanf(fp, "%s %i", buff, &qtd);
     }
 
     fclose(fp);
+    printf("Acabou de inserir, pregao esperando...\n");
 
 
     /*while (ofertas.inicio != NULL){
@@ -61,7 +70,7 @@ int main(int argc, char *argv[]){
 
     for(t=0;t<nthr;t++){
         rc = pthread_join(threads[t],NULL);
-        if(!rc) printf("Erro no join da thread %ld\n", t);
+        if(rc != 0) printf("Erro no join da thread %ld\n", t);
     }
     return 0;
 
