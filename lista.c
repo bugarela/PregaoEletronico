@@ -72,7 +72,7 @@ int compra(Oferta *ordem, Oferta *nova, Lista *lista, Lista *ordensCompra){
     if(nova->qtd == 0)
         remover(nova,lista);
 
-    printf("comprou %i\n",ret);
+    //printf("comprou %i\n",ret);
     return ret;
 }
 
