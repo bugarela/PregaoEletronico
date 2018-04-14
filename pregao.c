@@ -7,6 +7,7 @@
 
 int main(int argc, char *argv[]){
     ofertasDiponiveis = 0;
+    acabou = 0;
     FILE *fp;
     char buff[255];
     int qtd;
@@ -30,15 +31,17 @@ int main(int argc, char *argv[]){
         perror("erro em pthread_barrier_init()");
         exit(1);
     }
+    pthread_mutex_init(&mutex, NULL);
+    pthread_mutex_init(&mutexThreads, NULL);
+    pthread_cond_init(&c, NULL);
 
     Portfolio portfolios[nthr];
-    /* Criar Threads */
-    for(t=0;t<nthr;t++){
+    // Criar Threads
+    for(t = 0; t < nthr; t++){
         portfolios[t].nThread = t+1;
         rc = pthread_create(&threads[t], NULL, (void *)corretor, (void *)(&portfolios[t]));
-        if(rc) printf("Erro ao criar a thread %i\n",t);
+        if(rc) printf("Erro ao criar a thread %i\n", t);
     }
-
 
     pthread_barrier_wait(&barreira);
 
@@ -50,41 +53,43 @@ int main(int argc, char *argv[]){
 
     ret = fscanf(fp, "%s %i", buff, &qtd);
     while (ret != EOF){
-        if(ret == 2){
+        if(ret == 2){ //se houver o buff e a qtd no ret
             pthread_mutex_lock(&mutex);
-
             inserir(buff, qtd, &ofertas);
-
+            inserirNaOrdem(buff, qtd, &registroOfertas);
             ofertasDiponiveis++;
-            pthread_cond_signal(&c);
+            printf("Inseriu %ix %s\n",qtd,buff);
+            pthread_cond_broadcast(&c);
             pthread_mutex_unlock(&mutex);
-
-            inserir(buff, qtd, &registroOfertas);
         }
         ret = fscanf(fp, "%s %i", buff, &qtd);
     }
-
     fclose(fp);
-    //printf("Acabou de inserir, pregao esperando...\n");
 
-    for(t=0;t<nthr;t++){
-        rc = pthread_join(threads[t],NULL);
+    pthread_mutex_lock(&mutex);
+    acabou = 1;
+    pthread_cond_broadcast(&c);
+    pthread_mutex_unlock(&mutex);
+
+    printf("Acabou de inserir, pregao esperando...\n");
+    for(t = 0; t < nthr; t++){
+        rc = pthread_join(threads[t], NULL);
         if(rc != 0) printf("Erro no join da thread %i\n", t+1);
-        printf("Thread %i - Portfolio de itens:\n",t);
+        printf("Thread %i - Portfolio de itens:\n", t+1);
         printf("Item               Quantidade  Demanda\n");
         Item *i = portfolios[t].inicio;
         while(i != NULL){
-            printf(fmtport,i->oferta->nome,i->oferta->qtd,i->demanda);
+            printf(fmtport,i->oferta.nome,i->comprado,i->oferta.qtd);
             i = i->prox;
         }
     }
-
+    imprime(&ofertas);
     printf("Saldo de itens:\n");
     printf("Item               Quantidade  Ofertado\n");
     Oferta *pReg = registroOfertas.inicio;
     Oferta *p;
     while(pReg != NULL){
-        p = busca(pReg->nome,&ofertas);
+        p = busca(pReg->nome, &ofertas);
         if (p == NULL)
             qtd = 0;
         else{
@@ -97,8 +102,9 @@ int main(int argc, char *argv[]){
         pReg = registroOfertas.inicio;
     }
 
-    pthread_mutex_unlock(&mutex);
+    pthread_cond_destroy(&c);
+    pthread_mutex_destroy(&mutex);
+    pthread_mutex_destroy(&mutexThreads);
 
     return 0;
-
 }

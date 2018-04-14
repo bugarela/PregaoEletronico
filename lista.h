@@ -9,8 +9,8 @@ typedef struct b{
 }Lista;
 
 typedef struct c{
-    Oferta *oferta;
-    int demanda;
+    Oferta oferta;
+    int comprado;
     struct c *prox;
 }Item;
 
@@ -26,3 +26,5 @@ int compra(Oferta *ordem, Oferta *nova, Lista *lista, Lista *ordensCompra);
 Oferta *novaOferta(Lista *lista);
 void remover(Oferta *p, Lista *lista);
 Oferta* busca(char nome[255],Lista *lista);
+void imprime(Lista *lista);
+void inserirNaOrdem(char nome[255], int qtd, Lista *lista);
