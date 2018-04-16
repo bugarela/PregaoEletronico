@@ -67,29 +67,33 @@ void corretor(void *arg){
         // Espera enquanto já olhou todas as ofertas, mas ainda não acabou
         while (ofertasDiponiveis == 0)
             pthread_cond_wait(&c, &mutex);
-
+        temThreadOlhando = 1;
         olhouTudo = 0;
 
         // Entra na Região Crítica das Threads
         // Só uma Thread olha as ofertas por vez
         pthread_mutex_lock(&mutexThreads);
-        while(temThreadOlhando == 1)
+        while(outraThreadOlhando == 1)
             pthread_cond_wait(&cThreads, &mutexThreads);
-        temThreadOlhando = 1;
+        outraThreadOlhando = 1;
 
-
+        imprime(&ofertas);
         while(ordensCompra.inicio != NULL && !olhouTudo && !ret){
 
-            if(ofertas.inicio == NULL)
+            if(ofertas.inicio == NULL){
                 printf("Erro: Pegando oferta de lista vazia\n");
+                exit(1);
+            }
 
             // Primeira oferta = inicio
-            if(oferta == NULL)
+            if(oferta == NULL){
+                printf("Pegou primeiro");
                 oferta = ofertas.inicio;
-
+            }
             else
                 if(oferta->prox == NULL){
                     if(oferta->qtd == qtdUltimaAnterior){
+                        printf("Olhou tudo\n");
                         olhouTudo = 1;
                         break;
                     }
@@ -98,6 +102,7 @@ void corretor(void *arg){
                     oferta = oferta->prox;
                 }
 
+            printf("thread %i olhando %s\n",t,oferta->nome);
 
             Oferta *p = ordensCompra.inicio;
 
@@ -125,15 +130,18 @@ void corretor(void *arg){
 
         // Se acabou sem oferecer novas ofertas, termina
         if(ofertasDiponiveis == -1){
-            pthread_mutex_unlock(&mutex);
             temThreadOlhando = 0;
+            pthread_cond_signal(&cPregao);
+            pthread_mutex_unlock(&mutex);
+            outraThreadOlhando = 0;
             pthread_cond_signal(&cThreads);
             pthread_mutex_unlock(&mutexThreads);
             break;
         }
-
-        pthread_mutex_unlock(&mutex);
         temThreadOlhando = 0;
+        pthread_cond_signal(&cPregao);
+        pthread_mutex_unlock(&mutex);
+        outraThreadOlhando = 0;
         pthread_cond_signal(&cThreads);
         pthread_mutex_unlock(&mutexThreads);
         sched_yield();
@@ -149,12 +157,12 @@ void corretor(void *arg){
             port->inicio = item;
 
         pthread_mutex_lock(&mutexThreads);
-        while(temThreadOlhando == 1)
+        while(outraThreadOlhando == 1)
             pthread_cond_wait(&cThreads, &mutexThreads);
 
         p = busca(pReg->nome,&ordensCompra);
 
-        temThreadOlhando = 0;
+        outraThreadOlhando = 0;
         pthread_cond_signal(&cThreads);
         pthread_mutex_unlock(&mutexThreads);
 

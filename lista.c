@@ -31,6 +31,7 @@ void inserir(char nome[255], int qtd, Lista *lista){
       if(lista->inicio == NULL){
           lista->inicio = nova;
           nova->ant = NULL;
+          nova->prox = NULL;
       } else {
           lista->fim->prox = nova;
           nova->ant = lista->fim;
