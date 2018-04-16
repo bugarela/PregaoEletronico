@@ -13,7 +13,7 @@ int main(int argc, char *argv[]){
     temThreadOlhando = 0;
 
     FILE *fp;
-    char buff[255], hashtag = {'#'};
+    char buff[255];
     int qtd,ret,i,t;
 
     if (argv[1] == NULL || argv[2] == NULL){
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]){
 
         else {
 
-            if(strcmp(buff,&hashtag) == 0) // Leu o símbolo #
+            if(strcmp(buff,"#") == 0) // Leu o símbolo #
                 msleep(qtd);
 
             else {
@@ -74,14 +74,15 @@ int main(int argc, char *argv[]){
 
                 // Região Crítica
                 inserir(buff, qtd, &ofertas);
+                // Insere no registro sem fazer deslocamentos desnecessários
+                inserirNaOrdem(buff, qtd, &registroOfertas);
                 // Fim Região Crítica
 
-                ofertasDiponiveis++;
+                ofertasDiponiveis = 1;
                 pthread_cond_signal(&c);
                 pthread_mutex_unlock(&mutex);
 
-                // Insere no registro sem fazer deslocamentos desnecessários
-                inserirNaOrdem(buff, qtd, &registroOfertas);
+
             }
         }
 
@@ -92,7 +93,7 @@ int main(int argc, char *argv[]){
 
     // Avisa Threads que não terão novas ofertas
     pthread_mutex_lock(&mutex);
-    ofertasDiponiveis = FIM;
+    ofertasDiponiveis = -1;
     pthread_cond_broadcast(&c);
     pthread_mutex_unlock(&mutex);
 
