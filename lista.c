@@ -17,8 +17,7 @@ Oferta* busca(char nome[255],Lista *lista){
 
 void inserir(char nome[255], int qtd, Lista *lista){
     Oferta *nova = busca(nome,lista);
-    if (nova != NULL){
-        printf("inserindo repetido...\n");
+    if (nova != NULL){ // Já existe na lista
         qtd+=nova->qtd;
         remover(nova,lista);
         inserir(nome,qtd,lista);
@@ -59,9 +58,7 @@ int compra(Oferta *ordem, Oferta *nova, Lista *lista, Lista *ordensCompra){
     if (nova == NULL)
         return 0;
     int ret;
-    printf("comprando %i/%i\n",ordem->qtd,nova->qtd);
     if(nova->qtd < ordem->qtd){
-        printf("comprou tudo\n");
         ordem->qtd -= nova->qtd;
         ret = nova->qtd;
         remover(nova,lista);
@@ -72,13 +69,11 @@ int compra(Oferta *ordem, Oferta *nova, Lista *lista, Lista *ordensCompra){
         remover(ordem,ordensCompra);
     }
     else{
-        printf("comprou tudo e esta satisfeito\n");
         ret = ordem->qtd;
         remover(nova,lista);
         remover(ordem,ordensCompra);
     }
 
-    printf("comprou %i\n",ret);
     return ret;
 }
 
@@ -112,17 +107,3 @@ void inserirNaOrdem(char nome[255], int qtd, Lista *lista){
       lista->fim = nova;
     }
 }
-
-/*Oferta* novaOferta(Lista *lista){
-
-    Oferta *retorno;
-    if(lista->inicio == NULL){
-        printf("Buscou nova oferta em lista vazia\n");
-        return NULL;
-    }
-    strcpy(retorno->nome,lista->inicio->nome);
-    retorno->qtd = lista->inicio->qtd;
-    retorno->prox = NULL;
-
-    return retorno;
-}*/

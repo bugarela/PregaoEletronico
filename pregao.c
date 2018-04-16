@@ -6,12 +6,15 @@
 #include "corretor.h"
 
 int main(int argc, char *argv[]){
+
+    // Inicializa variáveis condicionais
     ofertasDiponiveis = 0;
     acabou = 0;
+    temThreadOlhando = 0;
+
     FILE *fp;
-    char buff[255];
-    int qtd;
-    int ret,i;
+    char buff[255], hashtag = {'#'};
+    int qtd,ret,i,t;
 
     if (argv[1] == NULL || argv[2] == NULL){
         printf("Uso: %s nthr nomearq\n",argv[0]);
@@ -20,61 +23,83 @@ int main(int argc, char *argv[]){
 
     int nthr = atoi(argv[1]);
     strcpy(nomearq,argv[2]);
-    //printf("nthr= %i, nomearq= %s\n\n",nthr, nomearq);
 
     pthread_t threads[nthr];
-    int rc;
-    int t;
+    Portfolio portfolios[nthr];
 
-    rc = pthread_barrier_init(&barreira, NULL, nthr+1);
-    if (rc != 0) {
-        perror("erro em pthread_barrier_init()");
-        exit(1);
-    }
+    // Inicializa semáforos
     pthread_mutex_init(&mutex, NULL);
     pthread_mutex_init(&mutexThreads, NULL);
     pthread_cond_init(&c, NULL);
+    pthread_cond_init(&cThreads, NULL);
 
-    Portfolio portfolios[nthr];
-    // Criar Threads
-    for(t = 0; t < nthr; t++){
-        portfolios[t].nThread = t+1;
-        rc = pthread_create(&threads[t], NULL, (void *)corretor, (void *)(&portfolios[t]));
-        if(rc) printf("Erro ao criar a thread %i\n", t);
+    // Inicializa barreira
+    ret = pthread_barrier_init(&barreira, NULL, nthr+1);
+    if (ret != 0) {
+        perror("erro em pthread_barrier_init()");
+        exit(1);
     }
 
+    // Cria Threads (corretores)
+    for(t = 0; t < nthr; t++){
+        portfolios[t].nThread = t+1;
+        ret = pthread_create(&threads[t], NULL, (void *)corretor, (void *)(&portfolios[t]));
+        if(ret) printf("Erro ao criar a thread %i\n", t);
+    }
+
+    // Espera Threads ficarem prontas
     pthread_barrier_wait(&barreira);
 
+    // Inicializa Listas (Global - modificável; e local - registro)
     Lista registroOfertas;
     inicia(&ofertas);
     inicia(&registroOfertas);
 
     fp = fopen(nomearq, "r");
-
     ret = fscanf(fp, "%s %i", buff, &qtd);
+
     while (ret != EOF){
-        if(ret == 2){ //se houver o buff e a qtd no ret
-            pthread_mutex_lock(&mutex);
-            inserir(buff, qtd, &ofertas);
-            inserirNaOrdem(buff, qtd, &registroOfertas);
-            ofertasDiponiveis++;
-            printf("Inseriu %ix %s\n",qtd,buff);
-            pthread_cond_broadcast(&c);
-            pthread_mutex_unlock(&mutex);
+
+        if(ret != 2)
+            printf("Erro na formatação do arquivo %s\nFormato = nomeProduto quantidade\n", nomearq);
+
+        else {
+
+            if(strcmp(buff,&hashtag) == 0) // Leu o símbolo #
+                msleep(qtd);
+
+            else {
+
+                pthread_mutex_lock(&mutex);
+
+                // Região Crítica
+                inserir(buff, qtd, &ofertas);
+                // Fim Região Crítica
+
+                ofertasDiponiveis++;
+                pthread_cond_signal(&c);
+                pthread_mutex_unlock(&mutex);
+
+                // Insere no registro sem fazer deslocamentos desnecessários
+                inserirNaOrdem(buff, qtd, &registroOfertas);
+            }
         }
+
         ret = fscanf(fp, "%s %i", buff, &qtd);
     }
+
     fclose(fp);
 
+    // Avisa Threads que não terão novas ofertas
     pthread_mutex_lock(&mutex);
-    acabou = 1;
+    ofertasDiponiveis = FIM;
     pthread_cond_broadcast(&c);
     pthread_mutex_unlock(&mutex);
 
-    printf("Acabou de inserir, pregao esperando...\n");
+    // Espera Threads e imprime portfólio conforme ficam prontas
     for(t = 0; t < nthr; t++){
-        rc = pthread_join(threads[t], NULL);
-        if(rc != 0) printf("Erro no join da thread %i\n", t+1);
+        ret = pthread_join(threads[t], NULL);
+        if(ret != 0) printf("Erro no join da thread %i\n", t+1);
         printf("Thread %i - Portfolio de itens:\n", t+1);
         printf("Item               Quantidade  Demanda\n");
         Item *i = portfolios[t].inicio;
@@ -82,8 +107,10 @@ int main(int argc, char *argv[]){
             printf(fmtport,i->oferta.nome,i->comprado,i->oferta.qtd);
             i = i->prox;
         }
+        printf("\n");
     }
-    imprime(&ofertas);
+
+    // Imprime Saldo
     printf("Saldo de itens:\n");
     printf("Item               Quantidade  Ofertado\n");
     Oferta *pReg = registroOfertas.inicio;
@@ -102,7 +129,9 @@ int main(int argc, char *argv[]){
         pReg = registroOfertas.inicio;
     }
 
+    // Destrói semáforos
     pthread_cond_destroy(&c);
+    pthread_cond_destroy(&cThreads);
     pthread_mutex_destroy(&mutex);
     pthread_mutex_destroy(&mutexThreads);
 
