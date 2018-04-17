@@ -14,7 +14,8 @@ void corretor(void *arg){
 
     FILE *fp;
     char buff[255], buffer[20];
-    int qtd,ret,i;
+    unsigned int qtd,ret;
+    int i, qtdI;
 
     // Edita o nome do arquivo buscado de acordo com os parametros
     // Ex: nomeArquivo-1
@@ -32,19 +33,30 @@ void corretor(void *arg){
     inicia(ordensRegistro);
 
     fp = fopen(buff,"r");
-    ret = fscanf(fp, "%s %i", buff, &qtd);
+    if(fp == NULL){
+        printf("Warning (Ignorado): Arquivo inexistente (%s)\n",buff);
+        port->inicio = NULL;
+        pthread_barrier_wait(&barreira);
+        pthread_exit(NULL);
+    }
+    ret = fscanf(fp, "%s %i", buff, &qtdI);
 
     while (ret != EOF){
 
         if(ret != 2)
-            printf("Erro na formatação do arquivo %s\nFormato = nomeProduto quantidade\n", buff);
+            printf("Warning (Ignorado): %s\nFormato = nomeProduto quantidade\n", buff);
+
+        else if(qtdI < 0)
+            printf("Warning (Ignorado): Quantidade deve ser positiva (%s -> %i)\n", buff, qtdI);
 
         else {
-            inserir(buff, qtd, &ordensCompra);
+            qtd = (unsigned int) qtdI;
+            if(qtd > 0)
+                inserir(buff, qtd, &ordensCompra);
             inserir(buff, qtd, ordensRegistro);
         }
 
-        ret = fscanf(fp, "%s %i", buff, &qtd);
+        ret = fscanf(fp, "%s %i", buff, &qtdI);
     }
 
     fclose(fp);
@@ -72,19 +84,29 @@ void corretor(void *arg){
             pthread_cond_wait(&c, &mutex);
         temThreadOlhando = 1;
 
-        oferta = NULL;
+        // Tenta restaurar o estado anterior (ou, ao menos, algo perto)
+        Oferta *p;
+        while (oferta != NULL){
+            // Vê se oferta ainda está na lista e no mesmo lugar
+            p = busca(oferta->nome,&ofertas);
+            if(p != oferta)
+                oferta = oferta->ant;
+            else
+                break;
+        }
+
         while(ordensCompra.inicio != NULL && (ofertasOlhadas <= ofertasDiponiveis) && !ret){
 
             ofertasOlhadas++;
 
             if(ofertas.inicio == NULL){
-                printf("Erro: Pegando oferta de lista vazia\n");
+                printf("ERRO (Inesperado): Pegando oferta de lista vazia\n");
                 exit(1);
             }
+
             // Primeira oferta = inicio
             if(oferta == NULL)
                 oferta = ofertas.inicio;
-
 
             else
                 if(oferta->prox == NULL){
@@ -92,10 +114,6 @@ void corretor(void *arg){
                         ofertasOlhadas = ofertasDiponiveis;
                         break;
                     }
-                    /*else{
-                        oferta = ofertas.fim;
-                        continue;
-                    }*/
                 }
                 else{
                     oferta = oferta->prox;
@@ -109,14 +127,12 @@ void corretor(void *arg){
                     p = p->prox;
 
                 if (p != NULL){
-                    int tem = oferta->qtd;
+                    unsigned int tem = oferta->qtd;
                     ret = compra(p,oferta,&ofertas,&ordensCompra);
                     if (!ret) printf("Erro ao comprar, thread %i\n",t);
-                    else{
-                        if(ofertasDiponiveis==1 && ret==tem){
+                    else
+                        if(ofertasDiponiveis==1 && ret==tem)
                             ofertasDiponiveis = 0;
-                        }
-                    }
                 }
             }
 
@@ -126,7 +142,7 @@ void corretor(void *arg){
         }
 
 
-        // Se acabou (não virão novas ofertas), termina
+        // Se acabou (não virão novas ofertas), e saiu do while porque não achou nada termina
         if(acabou == 1 && !ret){
             temThreadOlhando = 0;
             pthread_cond_signal(&cPregao);
@@ -134,6 +150,7 @@ void corretor(void *arg){
             pthread_mutex_unlock(&mutexThreads);
             break;
         }
+        // Se não, passa a vez para o pregão (preferencialmente) ou alguma outra Thread
         temThreadOlhando = 0;
         pthread_cond_signal(&cPregao);
         pthread_mutex_unlock(&mutex);
@@ -141,8 +158,8 @@ void corretor(void *arg){
         sched_yield();
     }
 
-    Oferta *pReg = ordensRegistro->inicio;
     Oferta *p;
+    Oferta *pReg = ordensRegistro->inicio;
 
     while(pReg != NULL){
         Item *item = (Item*)malloc(sizeof(Item));

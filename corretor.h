@@ -1,8 +1,5 @@
 #include "lista.h"
 
-
-#define FIM 999999
-
 pthread_barrier_t barreira;
 char nomearq[255];
 Lista ofertas;
@@ -15,4 +12,4 @@ pthread_cond_t cPregao;
 int ofertasDiponiveis;
 int acabou;
 int temThreadOlhando;
-int qtdUltimaAnterior;
+unsigned int qtdUltimaAnterior;

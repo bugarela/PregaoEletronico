@@ -1,7 +1,7 @@
 typedef struct a{
     struct a *prox, *ant;
     char nome[255];
-    int qtd;
+    unsigned int qtd;
 }Oferta;
 
 typedef struct b{
@@ -10,7 +10,7 @@ typedef struct b{
 
 typedef struct c{
     Oferta oferta;
-    int comprado;
+    unsigned int comprado;
     struct c *prox;
 }Item;
 
@@ -20,11 +20,11 @@ typedef struct d{
 }Portfolio;
 
 void inicia(Lista *lista);
-void inserir(char nome[255], int qtd, Lista *lista);
+void inserir(char nome[255], unsigned int qtd, Lista *lista);
 Oferta pop(Lista *lista);
-int compra(Oferta *ordem, Oferta *nova, Lista *lista, Lista *ordensCompra);
+unsigned int compra(Oferta *ordem, Oferta *nova, Lista *lista, Lista *ordensCompra);
 Oferta *novaOferta(Lista *lista);
 void remover(Oferta *p, Lista *lista);
 Oferta* busca(char nome[255],Lista *lista);
 void imprime(Lista *lista);
-void inserirNaOrdem(char nome[255], int qtd, Lista *lista);
+void inserirNaOrdem(char nome[255], unsigned int qtd, Lista *lista);

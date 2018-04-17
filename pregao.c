@@ -14,7 +14,8 @@ int main(int argc, char *argv[]){
 
     FILE *fp;
     char buff[255];
-    int qtd,ret,i,t;
+    unsigned int qtd,ret;
+    int i,t,qtdI;
 
     // qtdUltimaAnterior verifica se houveram novas ofertas quando só a quantidade de alguma oferta é alterada
     qtdUltimaAnterior = -1;
@@ -25,6 +26,11 @@ int main(int argc, char *argv[]){
     }
 
     int nthr = atoi(argv[1]);
+    if(nthr < 1){
+        printf("ERRO (Abortado): Numero de Threads deve ser maior do que 1 (%i)\n",nthr);
+        exit(1);
+    }
+
     strcpy(nomearq,argv[2]);
 
     pthread_t threads[nthr];
@@ -59,38 +65,51 @@ int main(int argc, char *argv[]){
     inicia(&registroOfertas);
 
     fp = fopen(nomearq, "r");
-    ret = fscanf(fp, "%s %i", buff, &qtd);
+    if(fp == NULL){
+        printf("ERRO (Abortado): Arquivo inexistente (%s)\n",nomearq);
+        exit(1);
+    }
 
+    ret = fscanf(fp, "%s %i", buff, &qtdI);
     while (ret != EOF){
 
         if(ret != 2)
-            printf("Erro na formatação do arquivo %s\nFormato = nomeProduto quantidade\n", nomearq);
+            printf("Warning (Ignorado): %s\nFormato = nomeProduto quantidade\n", nomearq);
+
+        else if(qtdI < 0)
+            printf("Warning (Ignorado): Quantidade deve ser positiva (%s -> %i)\n", buff, qtdI);
 
         else {
+
+            qtd = (unsigned int) qtdI;
 
             if(strcmp(buff,"#") == 0) // Leu o símbolo #
                 msleep(qtd);
 
-            else {
 
-                pthread_mutex_lock(&mutex);
-                while(temThreadOlhando == 1)
-                    pthread_cond_wait(&cPregao, &mutex);
-                // Região Crítica
-                inserir(buff, qtd, &ofertas);
+            else {
+                if(qtd > 0){
+                    pthread_mutex_lock(&mutex);
+                    while(temThreadOlhando == 1)
+                        pthread_cond_wait(&cPregao, &mutex);
+
+                    // Região Crítica
+                    inserir(buff, qtd, &ofertas);
+                    ofertasDiponiveis++;
+                    // Fim Região Crítica
+
+                    pthread_cond_signal(&c);
+                    pthread_mutex_unlock(&mutex);
+                }
+
                 // Insere no registro sem fazer deslocamentos desnecessários
                 inserirNaOrdem(buff, qtd, &registroOfertas);
-                ofertasDiponiveis++;
-                // Fim Região Crítica
-
-                pthread_cond_signal(&c);
-                pthread_mutex_unlock(&mutex);
 
 
             }
         }
 
-        ret = fscanf(fp, "%s %i", buff, &qtd);
+        ret = fscanf(fp, "%s %i", buff, &qtdI);
     }
 
     fclose(fp);
@@ -104,13 +123,22 @@ int main(int argc, char *argv[]){
     // Espera Threads e imprime portfólio conforme ficam prontas
     for(t = 0; t < nthr; t++){
         ret = pthread_join(threads[t], NULL);
-        if(ret != 0) printf("Erro no join da thread %i\n", t+1);
+        if(ret != 0)
+            printf("ERRO (Inesperado): Thread %i não deu join\n", t+1);
+
         printf("Thread %i - Portfolio de itens:\n", t+1);
-        printf("Item               Quantidade  Demanda\n");
-        Item *i = portfolios[t].inicio;
-        while(i != NULL){
-            printf(fmtport,i->oferta.nome,i->comprado,i->oferta.qtd);
-            i = i->prox;
+        if(portfolios[t].inicio == NULL)
+            printf("Sem retorno da Thread\n");
+        else{
+            printf("Item               Quantidade  Demanda\n");
+            Item *i = portfolios[t].inicio;
+            Item *freeI;
+            while(i != NULL){
+                printf(fmtport,i->oferta.nome,i->comprado,i->oferta.qtd);
+                freeI = i;
+                i = i->prox;
+                free(freeI);
+            }
         }
         printf("\n");
     }

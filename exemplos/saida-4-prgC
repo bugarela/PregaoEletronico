@@ -1,0 +1,26 @@
+Thread 1 - Portfolio de itens:
+Item               Quantidade  Demanda
+  Banana                    2        2
+  Uva                       0        0
+  Laranja                   0        1
+
+Thread 2 - Portfolio de itens:
+Item               Quantidade  Demanda
+  Uva                       2        2
+  Banana                    0        0
+
+Thread 3 - Portfolio de itens:
+Item               Quantidade  Demanda
+  Banana                    2        2
+  Uva                       0        0
+  Laranja                   0        1
+
+Thread 4 - Portfolio de itens:
+Item               Quantidade  Demanda
+  Uva                       2        2
+  Banana                    0        0
+
+Saldo de itens:
+Item               Quantidade  Ofertado
+  Banana                    3         7
+  Uva                       3         7

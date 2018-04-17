@@ -15,7 +15,7 @@ Oferta* busca(char nome[255],Lista *lista){
     return p;
 }
 
-void inserir(char nome[255], int qtd, Lista *lista){
+void inserir(char nome[255], unsigned int qtd, Lista *lista){
     Oferta *nova = busca(nome,lista);
     if (nova != NULL){ // Já existe na lista
         qtd+=nova->qtd;
@@ -54,10 +54,10 @@ void remover(Oferta *p, Lista *lista){
     p = NULL;
 }
 
-int compra(Oferta *ordem, Oferta *nova, Lista *lista, Lista *ordensCompra){
+unsigned int compra(Oferta *ordem, Oferta *nova, Lista *lista, Lista *ordensCompra){
     if (nova == NULL)
         return 0;
-    int ret;
+    unsigned int ret;
     if(nova->qtd < ordem->qtd){
         ordem->qtd -= nova->qtd;
         ret = nova->qtd;
@@ -86,7 +86,7 @@ void imprime(Lista *lista){
     }
 }
 
-void inserirNaOrdem(char nome[255], int qtd, Lista *lista){
+void inserirNaOrdem(char nome[255], unsigned int qtd, Lista *lista){
     Oferta *nova = busca(nome,lista);
     if (nova != NULL)
         nova->qtd+=qtd;
