@@ -11,7 +11,6 @@ int main(int argc, char *argv[]){
     ofertasDiponiveis = 0;
     acabou = 0;
     temThreadOlhando = 0;
-    outraThreadOlhando = 0;
 
     FILE *fp;
     char buff[255];
@@ -36,7 +35,6 @@ int main(int argc, char *argv[]){
     pthread_mutex_init(&mutexThreads, NULL);
     pthread_cond_init(&c, NULL);
     pthread_cond_init(&cPregao, NULL);
-    pthread_cond_init(&cThreads, NULL);
 
     // Inicializa barreira
     ret = pthread_barrier_init(&barreira, NULL, nthr+1);
@@ -78,15 +76,13 @@ int main(int argc, char *argv[]){
                 pthread_mutex_lock(&mutex);
                 while(temThreadOlhando == 1)
                     pthread_cond_wait(&cPregao, &mutex);
-                printf("pregao na area\n");
                 // Região Crítica
                 inserir(buff, qtd, &ofertas);
                 // Insere no registro sem fazer deslocamentos desnecessários
                 inserirNaOrdem(buff, qtd, &registroOfertas);
+                ofertasDiponiveis++;
                 // Fim Região Crítica
 
-                printf("pregao saindo da area\n");
-                ofertasDiponiveis++;
                 pthread_cond_signal(&c);
                 pthread_mutex_unlock(&mutex);
 
@@ -141,7 +137,6 @@ int main(int argc, char *argv[]){
     // Destrói semáforos
     pthread_cond_destroy(&c);
     pthread_cond_destroy(&cPregao);
-    pthread_cond_destroy(&cThreads);
     pthread_mutex_destroy(&mutex);
     pthread_mutex_destroy(&mutexThreads);
 

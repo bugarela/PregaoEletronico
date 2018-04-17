@@ -62,10 +62,6 @@ void corretor(void *arg){
         // Entra na Região Crítica das Threads
         // Só uma Thread olha as ofertas por vez
         pthread_mutex_lock(&mutexThreads);
-        printf("thread %i entrando",t);
-        /*while(outraThreadOlhando == 1)
-            pthread_cond_wait(&cThreads, &mutexThreads);
-        outraThreadOlhando = 1;*/
 
         // Entra na Região exclusiva entre Thread e Pregão.
         // Enquanto a Thread compra, o pregão não pode inserir
@@ -93,14 +89,13 @@ void corretor(void *arg){
             else
                 if(oferta->prox == NULL){
                     if(oferta->qtd == qtdUltimaAnterior){
-                        printf("Olhou tudo\n");
                         ofertasOlhadas = ofertasDiponiveis;
                         break;
                     }
-                    else{
+                    /*else{
                         oferta = ofertas.fim;
                         continue;
-                    }
+                    }*/
                 }
                 else{
                     oferta = oferta->prox;
@@ -114,18 +109,12 @@ void corretor(void *arg){
                     p = p->prox;
 
                 if (p != NULL){
-                    printf("---- NOVA COMPRA ----\n");
-                    imprime(&ofertas);
                     int tem = oferta->qtd;
                     ret = compra(p,oferta,&ofertas,&ordensCompra);
                     if (!ret) printf("Erro ao comprar, thread %i\n",t);
                     else{
-                        printf("Thread %i comprou %i/%i de %s\n",t,ret,tem,oferta->nome);
-                        imprime(&ofertas);
-                        printf("------------\n");
                         if(ofertasDiponiveis==1 && ret==tem){
                             ofertasDiponiveis = 0;
-                            //ofertasOlhadas--;
                         }
                     }
                 }
@@ -142,21 +131,12 @@ void corretor(void *arg){
             temThreadOlhando = 0;
             pthread_cond_signal(&cPregao);
             pthread_mutex_unlock(&mutex);
-            outraThreadOlhando = 0;
-            printf("thread %i saindo",t);
-
-            //pthread_cond_signal(&cThreads);
             pthread_mutex_unlock(&mutexThreads);
-
             break;
         }
         temThreadOlhando = 0;
         pthread_cond_signal(&cPregao);
         pthread_mutex_unlock(&mutex);
-        outraThreadOlhando = 0;
-        //pthread_cond_signal(&cThreads);
-        printf("thread %i saindo",t);
-
         pthread_mutex_unlock(&mutexThreads);
         sched_yield();
     }
