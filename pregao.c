@@ -17,6 +17,9 @@ int main(int argc, char *argv[]){
     char buff[255];
     int qtd,ret,i,t;
 
+    // qtdUltimaAnterior verifica se houveram novas ofertas quando só a quantidade de alguma oferta é alterada
+    qtdUltimaAnterior = -1;
+
     if (argv[1] == NULL || argv[2] == NULL){
         printf("Uso: %s nthr nomearq\n",argv[0]);
         exit(1);
@@ -82,7 +85,8 @@ int main(int argc, char *argv[]){
                 inserirNaOrdem(buff, qtd, &registroOfertas);
                 // Fim Região Crítica
 
-                ofertasDiponiveis = 1;
+                printf("pregao saindo da area\n");
+                ofertasDiponiveis++;
                 pthread_cond_signal(&c);
                 pthread_mutex_unlock(&mutex);
 
@@ -97,7 +101,7 @@ int main(int argc, char *argv[]){
 
     // Avisa Threads que não terão novas ofertas
     pthread_mutex_lock(&mutex);
-    ofertasDiponiveis = -1;
+    acabou = 1;
     pthread_cond_broadcast(&c);
     pthread_mutex_unlock(&mutex);
 

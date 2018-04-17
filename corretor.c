@@ -52,57 +52,60 @@ void corretor(void *arg){
     // Espera as outras Threads terminarem de inserir também
     pthread_barrier_wait(&barreira);
 
-    // qtdUltimaAnterior verifica se houveram novas ofertas quando só a quantidade de alguma oferta é alterada
-    int olhouTudo = 0, qtdUltimaAnterior = -1;
+    int ofertasOlhadas = 0;
     Oferta *oferta = NULL;
 
     // Só executa enquanto há ordens não atendidas e ainda há (potencialmente) ofertas para olhar
-    while(ordensCompra.inicio != NULL && (ofertasDiponiveis >= 0  || olhouTudo == 0)){
+    while(ordensCompra.inicio != NULL){
         ret = 0;
+
+        // Entra na Região Crítica das Threads
+        // Só uma Thread olha as ofertas por vez
+        pthread_mutex_lock(&mutexThreads);
+        printf("thread %i entrando",t);
+        /*while(outraThreadOlhando == 1)
+            pthread_cond_wait(&cThreads, &mutexThreads);
+        outraThreadOlhando = 1;*/
 
         // Entra na Região exclusiva entre Thread e Pregão.
         // Enquanto a Thread compra, o pregão não pode inserir
         pthread_mutex_lock(&mutex);
 
         // Espera enquanto já olhou todas as ofertas, mas ainda não acabou
-        while (ofertasDiponiveis == 0)
+        while (ofertasDiponiveis <= ofertasOlhadas && !acabou)
             pthread_cond_wait(&c, &mutex);
         temThreadOlhando = 1;
-        olhouTudo = 0;
 
-        // Entra na Região Crítica das Threads
-        // Só uma Thread olha as ofertas por vez
-        pthread_mutex_lock(&mutexThreads);
-        while(outraThreadOlhando == 1)
-            pthread_cond_wait(&cThreads, &mutexThreads);
-        outraThreadOlhando = 1;
+        oferta = NULL;
+        while(ordensCompra.inicio != NULL && (ofertasOlhadas <= ofertasDiponiveis) && !ret){
 
-        imprime(&ofertas);
-        while(ordensCompra.inicio != NULL && !olhouTudo && !ret){
+            ofertasOlhadas++;
 
             if(ofertas.inicio == NULL){
                 printf("Erro: Pegando oferta de lista vazia\n");
                 exit(1);
             }
-
             // Primeira oferta = inicio
-            if(oferta == NULL){
-                printf("Pegou primeiro");
+            if(oferta == NULL)
                 oferta = ofertas.inicio;
-            }
+
+
             else
                 if(oferta->prox == NULL){
                     if(oferta->qtd == qtdUltimaAnterior){
                         printf("Olhou tudo\n");
-                        olhouTudo = 1;
+                        ofertasOlhadas = ofertasDiponiveis;
                         break;
+                    }
+                    else{
+                        oferta = ofertas.fim;
+                        continue;
                     }
                 }
                 else{
                     oferta = oferta->prox;
                 }
 
-            printf("thread %i olhando %s\n",t,oferta->nome);
 
             Oferta *p = ordensCompra.inicio;
 
@@ -111,41 +114,51 @@ void corretor(void *arg){
                     p = p->prox;
 
                 if (p != NULL){
+                    printf("---- NOVA COMPRA ----\n");
+                    imprime(&ofertas);
                     int tem = oferta->qtd;
                     ret = compra(p,oferta,&ofertas,&ordensCompra);
                     if (!ret) printf("Erro ao comprar, thread %i\n",t);
-                    if(ofertas.inicio == NULL && ofertasDiponiveis == 1)
-                      ofertasDiponiveis = 0;
+                    else{
+                        printf("Thread %i comprou %i/%i de %s\n",t,ret,tem,oferta->nome);
+                        imprime(&ofertas);
+                        printf("------------\n");
+                        if(ofertasDiponiveis==1 && ret==tem){
+                            ofertasDiponiveis = 0;
+                            //ofertasOlhadas--;
+                        }
+                    }
                 }
             }
 
-            if(ofertas.fim != NULL)
-                qtdUltimaAnterior = ofertas.fim->qtd;
-            else qtdUltimaAnterior = -1;
+            if(oferta != NULL)
+                qtdUltimaAnterior = oferta->qtd;
 
         }
 
-        if(!ret)
-          olhouTudo = 1;
 
-        // Se acabou sem oferecer novas ofertas, termina
-        if(ofertasDiponiveis == -1){
+        // Se acabou (não virão novas ofertas), termina
+        if(acabou == 1 && !ret){
             temThreadOlhando = 0;
             pthread_cond_signal(&cPregao);
             pthread_mutex_unlock(&mutex);
             outraThreadOlhando = 0;
-            pthread_cond_signal(&cThreads);
+            printf("thread %i saindo",t);
+
+            //pthread_cond_signal(&cThreads);
             pthread_mutex_unlock(&mutexThreads);
+
             break;
         }
         temThreadOlhando = 0;
         pthread_cond_signal(&cPregao);
         pthread_mutex_unlock(&mutex);
         outraThreadOlhando = 0;
-        pthread_cond_signal(&cThreads);
+        //pthread_cond_signal(&cThreads);
+        printf("thread %i saindo",t);
+
         pthread_mutex_unlock(&mutexThreads);
         sched_yield();
-
     }
 
     Oferta *pReg = ordensRegistro->inicio;
@@ -157,13 +170,9 @@ void corretor(void *arg){
             port->inicio = item;
 
         pthread_mutex_lock(&mutexThreads);
-        while(outraThreadOlhando == 1)
-            pthread_cond_wait(&cThreads, &mutexThreads);
 
         p = busca(pReg->nome,&ordensCompra);
 
-        outraThreadOlhando = 0;
-        pthread_cond_signal(&cThreads);
         pthread_mutex_unlock(&mutexThreads);
 
         qtd = pReg->qtd;

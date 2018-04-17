@@ -1,0 +1,320 @@
+pregao na area
+pregao saindo da area
+Imprimindo lista:
+1x a
+dessas, thread 1 olhando a
+Olhou tudo
+pregao na area
+pregao saindo da area
+Imprimindo lista:
+1x a
+2x b
+dessas, thread 1 olhando b
+1x b removido
+Imprimindo lista:
+no more ordens 1
+pregao na area
+pregao saindo da area
+Imprimindo lista:
+1x a
+1x b
+3x c
+dessas, thread 7 olhando a
+Imprimindo lista:
+1x a
+1x b
+3x c
+dessas, thread 7 olhando b
+1x b removido
+Imprimindo lista:
+1x a
+3x c
+1x b removido
+Imprimindo lista:
+pregao na area
+pregao saindo da area
+Imprimindo lista:
+1x a
+3x c
+4x d
+dessas, thread 2 olhando a
+1x a removido
+Imprimindo lista:
+3x c
+4x d
+pregao na area
+pregao saindo da area
+Imprimindo lista:
+3x c
+4x d
+5x e
+dessas, thread 4 olhando c
+Imprimindo lista:
+3x c
+4x d
+5x e
+dessas, thread 4 olhando d
+Imprimindo lista:
+3x c
+4x d
+5x e
+dessas, thread 4 olhando e
+Olhou tudo
+pregao na area
+pregao saindo da area
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+dessas, thread 5 olhando c
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+dessas, thread 5 olhando d
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+dessas, thread 5 olhando e
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+dessas, thread 5 olhando f
+Olhou tudo
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+dessas, thread 6 olhando c
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+dessas, thread 6 olhando d
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+dessas, thread 6 olhando e
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+dessas, thread 6 olhando f
+Olhou tudo
+pregao na area
+pregao saindo da area
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+1x a
+no more ordens 7
+dessas, thread 2 olhando c
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+1x a
+dessas, thread 2 olhando d
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+1x a
+dessas, thread 2 olhando e
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+1x a
+dessas, thread 2 olhando f
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+1x a
+dessas, thread 2 olhando a
+1x a removido
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+Olhou tudo
+pregao na area
+pregao saindo da area
+Olhou tudo
+Olhou tudo
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+1x a
+8 8 acaboou 2
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+1x a
+dessas, thread 5 olhando a
+Olhou tudo
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+1x a
+8 8 acaboou 5
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+1x a
+dessas, thread 6 olhando a
+1x a removido
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+Thread 1 - Portfolio de itens:
+Item               Quantidade  Demanda
+  b                         1        1
+Olhou tudo
+
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+8 8 acaboou 6
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+dessas, thread 3 olhando c
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+dessas, thread 3 olhando d
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+dessas, thread 3 olhando e
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+dessas, thread 3 olhando f
+Olhou tudo
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+8 8 acaboou 3
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+dessas, thread 4 olhando f
+Olhou tudo
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+8 8 acaboou 4
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+Thread 2 - Portfolio de itens:
+Item               Quantidade  Demanda
+  a                         2        3
+dessas, thread 8 olhando c
+Imprimindo lista:
+3x c
+4x d
+
+5x e
+6x f
+Thread 3 - Portfolio de itens:
+dessas, thread 8 olhando d
+Imprimindo lista:
+3x c
+4x d
+Item               Quantidade  Demanda
+5x e
+6x f
+  b                         0        1
+
+Thread 4 - Portfolio de itens:
+Item               Quantidade  Demanda
+  a                         0        3
+
+dessas, thread 8 olhando e
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+dessas, thread 8 olhando f
+Olhou tudo
+Imprimindo lista:
+3x c
+4x d
+5x e
+6x f
+8 8 acaboou 8
+Thread 5 - Portfolio de itens:
+Item               Quantidade  Demanda
+  b                         0        1
+
+Thread 6 - Portfolio de itens:
+Item               Quantidade  Demanda
+  a                         1        3
+
+Thread 7 - Portfolio de itens:
+Item               Quantidade  Demanda
+  b                         1        1
+
+Thread 8 - Portfolio de itens:
+Item               Quantidade  Demanda
+  a                         0        3
+
+Saldo de itens:
+Item               Quantidade  Ofertado
+  a                         0         3
+  b                         0         2
+  c                         3         3
+  d                         4         4
+  e                         5         5
+  f                         6         6

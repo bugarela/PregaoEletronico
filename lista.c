@@ -51,7 +51,7 @@ void remover(Oferta *p, Lista *lista){
         p->ant->prox = p->prox;
     if(p->prox != NULL)
         p->prox->ant = p->ant;
-
+    printf("%ix %s removido\n", p->qtd, p->nome);
     p = NULL;
 }
 

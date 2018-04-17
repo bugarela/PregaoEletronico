@@ -17,3 +17,4 @@ int ofertasDiponiveis;
 int acabou;
 int temThreadOlhando;
 int outraThreadOlhando;
+int qtdUltimaAnterior;
