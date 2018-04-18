@@ -8,8 +8,6 @@ void corretor(void *arg);
 pthread_mutex_t mutex;
 pthread_mutex_t mutexThreads;
 pthread_cond_t c;
-pthread_cond_t cPregao;
 int ofertasDiponiveis;
 int acabou;
-int temThreadOlhando;
 unsigned int qtdUltimaAnterior;

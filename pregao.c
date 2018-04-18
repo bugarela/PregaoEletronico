@@ -10,7 +10,6 @@ int main(int argc, char *argv[]){
     // Inicializa variáveis condicionais
     ofertasDiponiveis = 0;
     acabou = 0;
-    temThreadOlhando = 0;
 
     FILE *fp;
     char buff[255];
@@ -40,7 +39,6 @@ int main(int argc, char *argv[]){
     pthread_mutex_init(&mutex, NULL);
     pthread_mutex_init(&mutexThreads, NULL);
     pthread_cond_init(&c, NULL);
-    pthread_cond_init(&cPregao, NULL);
 
     // Inicializa barreira
     ret = pthread_barrier_init(&barreira, NULL, nthr+1);
@@ -90,8 +88,6 @@ int main(int argc, char *argv[]){
             else {
                 if(qtd > 0){
                     pthread_mutex_lock(&mutex);
-                    while(temThreadOlhando == 1)
-                        pthread_cond_wait(&cPregao, &mutex);
 
                     // Região Crítica
                     inserir(buff, qtd, &ofertas);
@@ -164,7 +160,6 @@ int main(int argc, char *argv[]){
 
     // Destrói semáforos
     pthread_cond_destroy(&c);
-    pthread_cond_destroy(&cPregao);
     pthread_mutex_destroy(&mutex);
     pthread_mutex_destroy(&mutexThreads);
 

@@ -82,7 +82,6 @@ void corretor(void *arg){
         // Espera enquanto já olhou todas as ofertas, mas ainda não acabou
         while (ofertasDiponiveis <= ofertasOlhadas && !acabou)
             pthread_cond_wait(&c, &mutex);
-        temThreadOlhando = 1;
 
         // Tenta restaurar o estado anterior (ou, ao menos, algo perto)
         Oferta *p;
@@ -144,15 +143,11 @@ void corretor(void *arg){
 
         // Se acabou (não virão novas ofertas), e saiu do while porque não achou nada termina
         if(acabou == 1 && !ret){
-            temThreadOlhando = 0;
-            pthread_cond_signal(&cPregao);
             pthread_mutex_unlock(&mutex);
             pthread_mutex_unlock(&mutexThreads);
             break;
         }
         // Se não, passa a vez para o pregão (preferencialmente) ou alguma outra Thread
-        temThreadOlhando = 0;
-        pthread_cond_signal(&cPregao);
         pthread_mutex_unlock(&mutex);
         pthread_mutex_unlock(&mutexThreads);
         sched_yield();
